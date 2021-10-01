@@ -60,7 +60,21 @@ const database = {
             })
             return selectedRow;
         });
-        return [];
+        return rows;
+    },
+    delete(statement) {
+        const regExp = /delete from ([a-z]+)(?: where (.+))?/;
+        const parsedStatement = statement.match(regExp);
+        let [, tableName, whereClause] = parsedStatement;
+        if (whereClause) {
+            let [columnWhere, valueWhere] = whereClause.split(" = ");
+            this.tables[tableName].data = this.tables[tableName].data.filter(function (row) {
+                return row[columnWhere] !== valueWhere;
+            });
+        } else {
+            this.tables[tableName].data = [];
+        }
+        console.log(this.tables[tableName].data);
     },
     execute(statement) {
         if (statement.trim().startsWith("create table")) {
@@ -72,6 +86,9 @@ const database = {
         if (statement.startsWith("select")) {
             return this.select(statement);
         }
+        if (statement.startsWith("delete")) {
+            return this.delete(statement);
+        }
         throw new DatabaseError(statement, `Syntax error: ${statement}`);
     }
 };
@@ -81,8 +98,7 @@ const statements = [
     "insert into author (id, name, age) values (1, Douglas Crockford, 62)",
     "insert into author (id, name, age) values (2, Linus Torvalds, 47)",
     "insert into author (id, name, age) values (3, Martin Fowler, 54)",
-    "select name, age from author",
-    "select name, age from author where id = 1",
+    "delete from author where id = 2",
 ];
 
 statements.forEach(statement => {

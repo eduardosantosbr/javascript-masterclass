@@ -12,7 +12,7 @@ delete(value) - deletes an element specified by the value.
 entries() - return a new Interator that contains an array of [values, value].
 forEach(callback [, thisArg]) - invokes a callback on each element of the Set with the this value sets to thisArg in each call.
 has(value) - return true if an element with a given value is in the set, or false if it is not.
-keys() - is t he same as values() function.
+keys() - is the same as values() function.
 
 WeakSets
 

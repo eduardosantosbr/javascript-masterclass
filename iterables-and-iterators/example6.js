@@ -1,7 +1,18 @@
 function createIterator(...array) {
+    let i = 0;
     return {
         next() {
-            //if ()
+            if (i < array.length) {
+                return {
+                    value: array[i++],
+                    done: false,
+                }
+            } else {
+                return {
+                    value: undefined,
+                    done: true,
+                }
+            }
         }
     };
 }

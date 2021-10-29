@@ -1,19 +1,21 @@
-const DatabaseError = function (statement, message) {
-    return {
-        statement,
-        message,
-    };
+class DatabaseError {
+    constructor(statement, message) {
+        this.statement = statement;
+        this.message = message;
+    }
 }
 
-const Parser = function() {
-    const commands = new Map();
-    commands.set("createTable", /create table (\w+) \((.+)\)/);
-    commands.set("insert", /insert into ([a-z]+) \((.+)\) values \((.+)\)/);
-    commands.set("select", /select (.+) from ([a-z]+)(?: where (.+))?/);
-    commands.set("delete", /delete from ([a-z]+)(?: where (.+))?/);
+class Parser {
+    constructor() {
+        this.commands = new Map();
+        this.commands.set("createTable", /create table (\w+) \((.+)\)/);
+        this.commands.set("insert", /insert into ([a-z]+) \((.+)\) values \((.+)\)/);
+        this.commands.set("select", /select (.+) from ([a-z]+)(?: where (.+))?/);
+        this.commands.set("delete", /delete from ([a-z]+)(?: where (.+))?/);
+    }
 
-    this.parse = function(statement) {
-        for(let [command, regExp] of commands) {
+    parse (statement) {
+        for(let [command, regExp] of this.commands) {
             const parsedStatement = statement.match(regExp);
             if (parsedStatement) {
                 return {
@@ -25,9 +27,12 @@ const Parser = function() {
     }
 }
 
-const database = {
-    tables: {},
-    parser: new Parser(),
+class Database {
+    constructor() {
+        this.tables = {};
+        this.parser = new Parser();
+    }
+
     createTable(parsedStatement) {
         let [, tableName, columns] = parsedStatement; //Destructuring 
 
@@ -43,7 +48,8 @@ const database = {
             const [name, type] = column;
             this.tables[tableName].columns[name] = type;
         }
-    },
+    }
+
     insert(parsedStatement) {
         let [, tableName, columns, values] = parsedStatement; //Destructuring 
         columns = columns.split(", ");
@@ -55,7 +61,8 @@ const database = {
             row[column] = value;
         }
         this.tables[tableName].data.push(row);
-    },
+    }
+
     select(parsedStatement) {
         let [, columns, tableName, whereClause] = parsedStatement; //Destructuring 
         columns = columns.split(", ");
@@ -76,7 +83,8 @@ const database = {
             return selectedRow;
         });
         return rows;
-    },
+    }
+
     delete(parsedStatement) {
         let [, tableName, whereClause] = parsedStatement;
         if (whereClause) {
@@ -88,7 +96,8 @@ const database = {
             this.tables[tableName].data = [];
         }
         console.log(this.tables[tableName].data);
-    },
+    }
+
     execute(statement) {
         const result = this.parser.parse(statement);
         if (result) {
@@ -106,6 +115,7 @@ const statements = [
     "delete from author where id = 2",
 ];
 
+const database = new Database();
 statements.forEach(statement => {
     try {
         database.execute(statement);

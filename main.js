@@ -1,19 +1,16 @@
-import {Database} from './database.js';
-
-const statements = [
-    "create table author (id number, name string, age number, city string, state string, country string)",
-    "insert into author (id, name, age) values (1, Douglas Crockford, 62)",
-    "insert into author (id, name, age) values (2, Linus Torvalds, 47)",
-    "insert into author (id, name, age) values (3, Martin Fowler, 54)",
-    "delete from author where id = 2",
-];
+import { Database } from "./database.js";
 
 const database = new Database();
-statements.forEach(statement => {
-    try {
-        database.execute(statement);
-    } catch (error) {
-        console.log(error.message);
-    }
+database.execute("create table author (id number, name string, age number, city string, state string, country string)").then(function () {
+    return Promise.all([
+        database.execute("insert into author (id, name, age) values (1, Douglas Crockford, 62)"),
+        database.execute("insert into author (id, name, age) values (2, Linus Torvalds, 47)"),
+        database.execute("insert into author (id, name, age) values (3, Martin Fowler, 54)")
+    ]).then(function () {
+        return database.execute("select name, age from author").then(function (result) {
+            console.log(JSON.stringify(result, undefined, 2));
+        });
+    });
+}).catch(function (e) {
+    console.log(e.message);
 });
-console.log(JSON.stringify(database, undefined, 4));

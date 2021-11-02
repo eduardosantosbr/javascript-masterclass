@@ -73,10 +73,14 @@ export class Database {
     }
 
     execute(statement) {
-        const result = this.parser.parse(statement);
-        if (result) {
-            return this[result.command](result.parsedStatement);
-        }
-        throw new DatabaseError(statement, `Syntax error: ${statement}`);
+        return new Promise((resolve, reject) => {
+            setTimeout(() => {
+                const result = this.parser.parse(statement);
+                if (result) {
+                    resolve(this[result.command](result.parsedStatement));
+                }
+                reject(new DatabaseError(statement, `Syntax error: ${statement}`));
+            }, 1000);
+        });
     }
 };
